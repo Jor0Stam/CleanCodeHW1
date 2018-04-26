@@ -1,5 +1,6 @@
 package bg.uni.sofia.fmi.mjt.dungeon;
 import java.util.Scanner;
+import java.util.Stack;
 
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Enemy;
 import bg.uni.sofia.fmi.mjt.dungeon.actor.Hero;
@@ -39,8 +40,16 @@ public class DungeonsTest {
 		Position place = new Position(0,0);
 		Hero johnsnow = new Hero("johnsnow", 100, 50, place);
 		
-		Treasure[] treasures = {four,blood, oathkeeper, manaPotion};
-		Enemy[] enemies = {joffrey,littlefinger,nightking};
+		Stack<Treasure> treasures = new Stack<>();
+		treasures.push(four);
+		treasures.push(blood);
+        treasures.push(manaPotion);
+        treasures.push(oathkeeper);
+
+		Stack<Enemy> enemies = new Stack<>();
+        enemies.push(nightking);
+        enemies.push(littlefinger);
+        enemies.push(joffrey);
 		
 		GameEngine gameEngine = new GameEngine(exampleMap, johnsnow, enemies, treasures);
 		
@@ -54,10 +63,7 @@ public class DungeonsTest {
 			//gameEngine.printMap();
 		}while(result != "You have successfully passed through the dungeon. Congrats!" || 
 			   result != "Hero is dead! Game over!");
-		
-		
-		
-			
+
 	}
 
 }

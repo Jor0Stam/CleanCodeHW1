@@ -3,48 +3,39 @@ package bg.uni.sofia.fmi.mjt.dungeon;
 import bg.uni.sofia.fmi.mjt.dungeon.actor.*;
 import bg.uni.sofia.fmi.mjt.dungeon.treasure.*;
 
+import java.util.Stack;
+
 public class GameEngine {
+
+    private static final int DUNGEON_WIDTH = 5;
+    private static final int DUNGEON_HEIGHT = 10;
+    private static final int LEFT = 0;
+    private static final int RIGHT = 2;
+    private static final int DOWN = 3;
+    private static final int UP = 1;
     private char[][] map;
     private Hero hero;
-    private Enemy[] enemies;
-    private Treasure[] treasures;
+    private Stack<Enemy> enemies;
+    private Stack<Treasure> treasures;
 
     public GameEngine() {
-        map = new char[5][10];
-        enemies = new Enemy[10];
-        treasures = new Treasure[10];
+        map = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT ];
+        enemies = new Stack<>();
+        treasures = new Stack<>();
     }
 
-    public GameEngine(char[][] map, Hero hero, Enemy[] enemies, Treasure[] treasures) {
-        this.map = new char[5][10];
+    public GameEngine(char[][] map, Hero hero, Stack<Enemy> enemies, Stack<Treasure> treasures) {
+        this.map = new char[DUNGEON_WIDTH][DUNGEON_HEIGHT ];
         this.map = map;
         this.hero = hero;
-        this.enemies = new Enemy[enemies.length];
         this.enemies = enemies;
-        this.treasures = new Treasure[treasures.length];
         this.treasures = treasures;
     }
 
-    char[][] getMap() {
+    public char[][] getMap() {
         return this.map;
     }
 
-    //removes the first treasure
-    public void collectTreasure() {
-        for (int i = 0; i < treasures.length - 1; i++) {
-            treasures[i] = treasures[i + 1];
-        }
-    }
-
-    // returns the first enemy that has not yet been defeated
-    Enemy undefeated() {
-        for (Enemy e : enemies) {
-            if (e.isAlive()) {
-                return e;
-            }
-        }
-        return enemies[0];
-    }
 
     public boolean fight(Enemy enemy) {
         while (hero.isAlive() && enemy.isAlive()) {
@@ -55,9 +46,9 @@ public class GameEngine {
     }
 
 
-    String makeMove(int command) {
+    public String makeMove(int command) {
 
-        if (command == 0 || command == 1 || command == 2 || command == 3) {
+        if (command == LEFT || command == UP || command == RIGHT || command == DOWN) {
 
             if (hero.getPosition().isValidPosition(command)) {
 
@@ -71,13 +62,12 @@ public class GameEngine {
                     case 'G':
                         return "You have successfully passed through the dungeon. Congrats!";
                     case 'T':
-                        String message = treasures[0].collect(hero);
-                        collectTreasure();
+                        String message = treasures.pop().collect(hero);
                         changeMap(command);
                         hero.getPosition().ChangePosition(command);
                         return message;
                     case 'E':
-                        if (!fight(undefeated())) {
+                        if (!fight(enemies.pop())) {
                             return "Hero is dead! Game over!";
                         } else {
                             changeMap(command);
@@ -97,15 +87,15 @@ public class GameEngine {
     public char goalPosition(int command) {
 
         switch (command) {
-            case 0:
-                return map[hero.getPosition().getVP()][hero.getPosition().getHP() - 1];
-            case 1:
-                return map[hero.getPosition().getVP() - 1][hero.getPosition().getHP()];
+            case LEFT:
+                return map[hero.getPosition().getVP()][hero.getPosition().getHP() - UP];
+            case UP:
+                return map[hero.getPosition().getVP() - UP][hero.getPosition().getHP()];
             case 2:
-                return map[hero.getPosition().getVP()][hero.getPosition().getHP() + 1];
+                return map[hero.getPosition().getVP()][hero.getPosition().getHP() + UP];
         }
 
-        return map[hero.getPosition().getVP() + 1][hero.getPosition().getHP()];
+        return map[hero.getPosition().getVP() + UP][hero.getPosition().getHP()];
     }
 
 
@@ -114,17 +104,17 @@ public class GameEngine {
     public void changeMap(int command) {
 
         switch (command) {
-            case 0:
-                map[hero.getPosition().getVP()][hero.getPosition().getHP() - 1] = 'H';
+            case LEFT:
+                map[hero.getPosition().getVP()][hero.getPosition().getHP() - UP] = 'H';
                 break;
-            case 1:
-                map[hero.getPosition().getVP() - 1][hero.getPosition().getHP()] = 'H';
+            case UP:
+                map[hero.getPosition().getVP() - UP][hero.getPosition().getHP()] = 'H';
                 break;
             case 2:
-                map[hero.getPosition().getVP()][hero.getPosition().getHP() + 1] = 'H';
+                map[hero.getPosition().getVP()][hero.getPosition().getHP() + UP] = 'H';
                 break;
-            case 3:
-                map[hero.getPosition().getVP() + 1][hero.getPosition().getHP()] = 'H';
+            case DOWN:
+                map[hero.getPosition().getVP() + UP][hero.getPosition().getHP()] = 'H';
         }
         map[hero.getPosition().getVP()][hero.getPosition().getHP()] = '.';
 
